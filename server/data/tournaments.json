@@ -1,0 +1,10 @@
+[
+  { "id": "t-coral-springs-eagle-trace", "slug": "coral-springs-eagle-trace", "dates_label": "July 12 – 13", "city": "Coral Springs, FL", "tee_time": "8:00 AM", "course": "Eagle Trace Golf Club", "month": "July", "year": 2026, "tbd": false, "sort_order": 1 },
+  { "id": "t-janesville-glen-erin", "slug": "janesville-glen-erin", "dates_label": "July 24 – 25", "city": "Janesville, WI", "tee_time": "7:30 AM", "course": "Glen Erin Golf Club", "month": "July", "year": 2026, "tbd": false, "sort_order": 2 },
+  { "id": "t-hayward-big-fish", "slug": "hayward-big-fish", "dates_label": "August 5 – 6", "city": "Hayward, WI", "tee_time": "9:00 AM", "course": "Big Fish Golf Club", "month": "August", "year": 2026, "tbd": false, "sort_order": 3 },
+  { "id": "t-madison-tbd", "slug": "madison-tbd", "dates_label": "August 18 – 19", "city": "Madison, WI", "tee_time": "TBA", "course": "Course TBD", "month": "August", "year": 2026, "tbd": true, "sort_order": 4 },
+  { "id": "t-naples-tiburon", "slug": "naples-tiburon", "dates_label": "September 9 – 10", "city": "Naples, FL", "tee_time": "8:00 AM", "course": "Tiburón Golf Club", "month": "September", "year": 2026, "tbd": true, "sort_order": 5 },
+  { "id": "t-milwaukee-tbd", "slug": "milwaukee-tbd", "dates_label": "September 22 – 23", "city": "Milwaukee, WI", "tee_time": "TBA", "course": "Course TBD", "month": "September", "year": 2026, "tbd": true, "sort_order": 6 },
+  { "id": "t-palm-beach-pga", "slug": "palm-beach-pga", "dates_label": "October 7 – 8", "city": "Palm Beach, FL", "tee_time": "8:30 AM", "course": "PGA National (Fazio)", "month": "October", "year": 2026, "tbd": true, "sort_order": 7 },
+  { "id": "t-championship-finale", "slug": "championship-finale", "dates_label": "October 21 – 22", "city": "Championship Finale", "tee_time": "8:00 AM", "course": "TPC Sawgrass — Dye's Valley", "month": "October", "year": 2026, "tbd": true, "sort_order": 8 }
+]
