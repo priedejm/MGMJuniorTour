@@ -60,6 +60,14 @@ export function RevealObserver() {
           el.classList.remove("is-visible");
         }
 
+        // Anything already in view on load/navigation must be shown right away —
+        // the IntersectionObserver can miss tall or late-rendered above-the-fold
+        // blocks, leaving the page blank until the user scrolls. Reveal them now.
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          el.classList.add("is-visible");
+          return;
+        }
+
         if (!el.classList.contains("is-visible")) {
           io.observe(el);
         }
