@@ -3,7 +3,7 @@ import { apiUpload } from "./api-client";
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-export type UploadFolder = "photos" | "results" | "packages" | "misc";
+export type UploadFolder = "photos" | "results" | "packages" | "partners" | "misc";
 
 export async function uploadImage(
   file: File,

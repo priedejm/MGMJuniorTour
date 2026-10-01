@@ -1,15 +1,33 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getTournamentBySlug, type TournamentPricingRow } from "@/data/mockTournaments";
-import { mockSchedule } from "@/data/mockSchedule";
+import { useState } from "react";
+import { toast } from "sonner";
+import { getTournamentBySlug, type TournamentPricingRow } from "@/data/tournamentContent";
 import { CalendarDays, Clock, MapPin, Users, AlertCircle, Phone, Mail, ArrowLeft } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiGet } from "@/lib/api-client";
+import type { TournamentRow } from "@/lib/admin.functions";
+import { parsePrice, useCart } from "@/lib/cart";
+
+type ScheduleRowSummary = { city: string; dates: string; year: number; time: string };
 
 export const Route = createFileRoute("/_site/tournament/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const tournament = getTournamentBySlug(params.slug);
-    // For rows without full data (TBD), return the schedule row instead.
-    const scheduleRow = mockSchedule.find((r) => r.slug === params.slug);
-    if (!tournament && !scheduleRow) throw notFound();
-    return { tournament, scheduleRow };
+    if (tournament) return { tournament, scheduleRow: null as ScheduleRowSummary | null };
+
+    // Not in the hand-curated content set yet — check the live tournament
+    // list (admin-added events with only schedule metadata so far) so a
+    // brand-new event still gets a "coming soon" page instead of a 404.
+    const rows = await apiGet<TournamentRow[]>("/list-tournaments.php");
+    const row = rows.find((r) => r.slug === params.slug);
+    if (!row) throw notFound();
+    const scheduleRow: ScheduleRowSummary = {
+      city: row.city,
+      dates: row.dates_label,
+      year: row.year,
+      time: row.tee_time,
+    };
+    return { tournament: null, scheduleRow };
   },
   head: ({ loaderData }) => {
     if (!loaderData?.tournament) {
@@ -59,6 +77,19 @@ function TournamentNotFound() {
 
 function TournamentDetail() {
   const { tournament, scheduleRow } = Route.useLoaderData();
+  const { addItem } = useCart();
+  const [periodIndex, setPeriodIndex] = useState(0);
+  const [priceType, setPriceType] = useState<"memberPrice" | "nonMemberPrice">("memberPrice");
+
+  const { data: livePricing } = useQuery({
+    queryKey: ["public", "tournament-pricing", tournament?.slug ?? ""],
+    queryFn: async () => {
+      const rows = await apiGet<TournamentRow[]>("/list-tournaments.php");
+      const row = rows.find((r) => r.slug === tournament?.slug);
+      return row?.pricing?.length ? row.pricing : null;
+    },
+    enabled: !!tournament,
+  });
 
   if (!tournament && scheduleRow) {
     return (
@@ -102,6 +133,26 @@ function TournamentDetail() {
 
   if (!tournament) return null;
   const t = tournament;
+  const pricing = livePricing ?? [];
+  const selectedRow = pricing[Math.min(periodIndex, pricing.length - 1)];
+  const displayPrice = selectedRow?.[priceType];
+
+  const handleAddToCart = () => {
+    if (!selectedRow || !displayPrice) return;
+    const safeIndex = pricing.indexOf(selectedRow);
+    addItem({
+      slug: `${t.slug}-${priceType}-${safeIndex}`,
+      type: "tournament",
+      tournamentSlug: t.slug,
+      periodIndex: safeIndex,
+      priceType,
+      name: `${t.name} — ${selectedRow.period} (${priceType === "memberPrice" ? "Member / First-Time" : "Non-Member / Returning"})`,
+      price: displayPrice,
+      unitPrice: parsePrice(displayPrice),
+      image: t.heroImage,
+    });
+    toast.success(`${t.name} entry added to cart`);
+  };
 
   return (
     <>
@@ -116,18 +167,18 @@ function TournamentDetail() {
         <div className="relative max-w-7xl mx-auto px-6 py-16 w-full text-white">
           <Link
             to="/schedule"
-            className="inline-flex items-center gap-2 text-white/80 hover:text-gold text-sm font-medium uppercase tracking-wider mb-6"
+            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium uppercase tracking-wider mb-6"
           >
             <ArrowLeft className="size-4" /> All Tournaments
           </Link>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold mb-3">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white mb-3">
             Registration Open
           </div>
           <h1 className="font-display font-black uppercase text-4xl md:text-6xl tracking-tight leading-[1.05] max-w-3xl">
             {t.name}
           </h1>
           <p className="mt-4 text-xl text-slate-200">
-            {t.city} at <span className="text-gold">{t.course}</span>
+            {t.city} at <span className="text-white font-semibold">{t.course}</span>
           </p>
         </div>
       </section>
@@ -185,7 +236,7 @@ function TournamentDetail() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {t.pricing.map((row: TournamentPricingRow) => (
+                    {pricing.map((row: TournamentPricingRow) => (
                       <tr key={row.period}>
                         <td className="px-6 py-5 text-slate-700 font-medium">
                           {row.period}
@@ -198,6 +249,13 @@ function TournamentDetail() {
                         </td>
                       </tr>
                     ))}
+                    {pricing.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="px-6 py-8 text-center text-slate-400">
+                          Pricing coming soon — contact us below for details.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -219,34 +277,88 @@ function TournamentDetail() {
           {/* Sidebar CTA */}
           <aside className="lg:col-span-1">
             <div className="bg-navy text-white p-8 rounded-xl sticky top-24">
-              <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold mb-3">
+              <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/70 mb-3">
                 Register Now
               </div>
-              <div className="text-4xl font-black mb-2">
-                {t.pricing[0]?.memberPrice}
-                <span className="text-sm text-slate-400 font-normal ml-2">
-                  early member rate
-                </span>
-              </div>
-              <p className="text-slate-300 text-sm mb-6">
-                Secure your spot before the {t.earlyDeadline} deadline.
-              </p>
-              <a
-                href={`mailto:${t.contactEmail}?subject=${encodeURIComponent(`Register: ${t.name}`)}`}
-                className="block text-center bg-gold hover:bg-white text-navy py-4 rounded font-bold uppercase text-sm tracking-wider transition-colors"
-              >
-                Register Player
-              </a>
+
+              {pricing.length > 0 && selectedRow ? (
+                <>
+                  <div className="space-y-3 mb-5">
+                    <label className="block">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
+                        Registration Period
+                      </span>
+                      <select
+                        value={pricing.indexOf(selectedRow)}
+                        onChange={(e) => setPeriodIndex(Number(e.target.value))}
+                        className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-white text-sm"
+                      >
+                        {pricing.map((row, i) => (
+                          <option key={row.period} value={i} className="text-navy">
+                            {row.period}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
+                        Rate
+                      </span>
+                      <select
+                        value={priceType}
+                        onChange={(e) => setPriceType(e.target.value as "memberPrice" | "nonMemberPrice")}
+                        className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-white text-sm"
+                      >
+                        <option value="memberPrice" className="text-navy">Member / First-Time</option>
+                        <option value="nonMemberPrice" className="text-navy">Non-Member / Returning</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="text-4xl font-black mb-2">{displayPrice}</div>
+                  <p className="text-slate-300 text-sm mb-6">
+                    Secure your spot before the {t.earlyDeadline} deadline.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="block w-full text-center bg-white hover:bg-navy-light text-navy hover:text-white py-4 rounded font-bold uppercase text-sm tracking-wider transition-colors"
+                  >
+                    Add to Cart
+                  </button>
+                  <p className="mt-3 text-[11px] text-white/50 text-center">
+                    Secure payment powered by Stripe.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-4xl font-black mb-2">
+                    <span className="text-2xl">Contact for pricing</span>
+                  </div>
+                  <p className="text-slate-300 text-sm mb-6">
+                    Secure your spot before the {t.earlyDeadline} deadline.
+                  </p>
+                  <a
+                    href={`mailto:${t.contactEmail}?subject=${encodeURIComponent(`Register: ${t.name}`)}`}
+                    className="block text-center bg-white hover:bg-navy-light text-navy hover:text-white py-4 rounded font-bold uppercase text-sm tracking-wider transition-colors"
+                  >
+                    Register Player
+                  </a>
+                </>
+              )}
+
               <div className="mt-6 pt-6 border-t border-white/10 space-y-3 text-sm">
+                <p className="text-[11px] text-white/50 uppercase tracking-wider mb-1">
+                  Prefer to register by phone or email?
+                </p>
                 <a
                   href={`tel:${t.contactPhone}`}
-                  className="flex items-center gap-3 text-slate-200 hover:text-gold"
+                  className="flex items-center gap-3 text-slate-200 hover:text-white"
                 >
                   <Phone className="size-4" /> {t.contactPhone}
                 </a>
                 <a
                   href={`mailto:${t.contactEmail}`}
-                  className="flex items-center gap-3 text-slate-200 hover:text-gold"
+                  className="flex items-center gap-3 text-slate-200 hover:text-white"
                 >
                   <Mail className="size-4" /> {t.contactEmail}
                 </a>
@@ -271,7 +383,7 @@ function InfoBlock({
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-6">
       <div className="flex items-center gap-3 mb-3">
-        <div className="size-9 rounded-lg bg-navy text-gold grid place-items-center">
+        <div className="size-9 rounded-lg bg-navy text-white grid place-items-center">
           <Icon className="size-4" />
         </div>
         <div className="text-xs font-bold uppercase tracking-widest text-slate-500">

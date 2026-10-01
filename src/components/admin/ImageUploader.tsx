@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { uploadImage } from "@/lib/upload.functions";
 import { inputCls } from "./adminUi";
 
-type Folder = "photos" | "results" | "packages" | "misc";
+type Folder = "photos" | "results" | "packages" | "partners" | "misc";
 
 export function ImageUploader({
   value,

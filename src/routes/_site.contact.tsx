@@ -43,9 +43,20 @@ function ContactPage() {
             <p className="text-[10px] uppercase tracking-[0.3em] text-gold font-bold mb-6">
               Get in Touch
             </p>
-            <h1 className="font-display font-black uppercase italic text-navy leading-[0.9] text-5xl lg:text-6xl mb-12">
+            <h1 className="font-display font-black uppercase italic text-navy leading-[0.9] text-5xl lg:text-6xl mb-8">
               Contact<br />The Tour
             </h1>
+
+            <figure className="mb-10">
+              <img
+                src="/assets/uploaded/photos/me-and-chuck-contact.jpg"
+                alt="Chuck and the tour director on the course"
+                className="w-full h-auto rounded-xl shadow-md"
+              />
+              <figcaption className="text-[11px] uppercase tracking-wide text-navy/50 mt-2">
+                Chuck &amp; the tour team
+              </figcaption>
+            </figure>
 
             <div className="space-y-10">
               <InfoBlock label="General Enquiries">
@@ -55,19 +66,21 @@ function ContactPage() {
                 </a>
               </InfoBlock>
               <InfoBlock label="Press & Media">
-                <p className="font-medium">press@mgmjuniortour.com</p>
+                <p className="font-medium">dan@morgangolfmanagement.com</p>
+                <a href="tel:+17753865594" className="block text-navy/70 text-sm mt-1 hover:text-gold transition-colors">
+                  (775) 386-5594
+                </a>
               </InfoBlock>
               <InfoBlock label="Headquarters">
-                <p className="font-medium">1200 Fairway Drive</p>
-                <p className="text-navy/70 text-sm mt-1">Coral Springs, FL 33065</p>
+                <p className="font-medium">3983 South McCarran Blvd. Suite 437</p>
+                <p className="text-navy/70 text-sm mt-1">Reno, NV 89502</p>
               </InfoBlock>
             </div>
           </div>
 
           <div className="mt-16 flex gap-6 text-gold text-xs uppercase tracking-wider font-bold">
-            <a href="#" className="hover:text-navy transition-colors">Instagram</a>
-            <a href="#" className="hover:text-navy transition-colors">Facebook</a>
-            <a href="#" className="hover:text-navy transition-colors">YouTube</a>
+            <a href="https://www.instagram.com/mgmjrtourgolf/" target="_blank" rel="noopener noreferrer" className="hover:text-navy transition-colors">Instagram</a>
+            <a href="https://www.facebook.com/MorganGolfManagement1" target="_blank" rel="noopener noreferrer" className="hover:text-navy transition-colors">Facebook</a>
           </div>
         </aside>
 
@@ -133,7 +146,7 @@ function ContactPage() {
           <div className="mt-12 flex items-start gap-4 p-4 border border-gold/25 bg-cream/50">
             <span className="w-2 h-2 rounded-full bg-gold mt-1.5 shrink-0" />
             <p className="text-[11px] leading-relaxed text-navy/60 uppercase tracking-wide">
-              Registrations for the current season are open. Our team responds to new inquiries within two business days.
+              Registrations for the current season are open. Our team responds to new inquiries within 24 hours.
             </p>
           </div>
         </div>

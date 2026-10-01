@@ -1,16 +1,19 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Check, Gift, ArrowLeft, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { mockPackages } from "@/data/mockPackages";
-import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api-client";
 import type { PackageRow } from "@/lib/admin.functions";
 import { parsePrice, useCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/_site/packages/$slug")({
-  head: ({ params }) => {
-    const pkg = mockPackages.find((p) => p.slug === params.slug);
-    if (!pkg) {
+  loader: async ({ params }) => {
+    const rows = await apiGet<PackageRow[]>("/list-packages.php");
+    const pkg = rows.find((p) => p.slug === params.slug);
+    if (!pkg) throw notFound();
+    return { pkg };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData?.pkg) {
       return {
         meta: [
           { title: "Package Not Found — MGM Junior Tour" },
@@ -18,20 +21,16 @@ export const Route = createFileRoute("/_site/packages/$slug")({
         ],
       };
     }
+    const pkg = loaderData.pkg;
     return {
       meta: [
         { title: `${pkg.name} — MGM Junior Tour` },
         { name: "description", content: pkg.description },
         { property: "og:title", content: `${pkg.name} — MGM Junior Tour` },
         { property: "og:description", content: pkg.description },
-        { property: "og:image", content: pkg.image },
+        { property: "og:image", content: pkg.image_url },
       ],
     };
-  },
-  loader: ({ params }) => {
-    const pkg = mockPackages.find((p) => p.slug === params.slug);
-    if (!pkg) throw notFound();
-    return { pkg };
   },
   notFoundComponent: PackageNotFound,
   component: PackageDetailPage,
@@ -51,31 +50,8 @@ function PackageNotFound() {
 }
 
 function PackageDetailPage() {
-  const { pkg: fallback } = Route.useLoaderData();
+  const { pkg } = Route.useLoaderData();
   const { addItem } = useCart();
-  const { data } = useQuery({
-    queryKey: ["public", "packages", fallback.slug],
-    queryFn: async () => {
-      const rows = await apiGet<PackageRow[]>("/list-packages.php");
-      const data = rows.find((p) => p.slug === fallback.slug);
-      if (!data) return null;
-      return {
-        slug: data.slug,
-        name: data.name,
-        price: data.price,
-        callout: data.callout,
-        image: data.image_url || fallback.image,
-        description: data.description,
-        included: data.included,
-        bonuses: data.bonuses,
-        totalValue: data.total_value,
-        disclaimer: data.disclaimer,
-        featured: data.featured,
-        features: data.features,
-      };
-    },
-  });
-  const pkg = data ?? fallback;
 
   const handleAdd = () => {
     addItem({
@@ -83,7 +59,7 @@ function PackageDetailPage() {
       name: pkg.name,
       price: pkg.price,
       unitPrice: parsePrice(pkg.price),
-      image: pkg.image,
+      image: pkg.image_url,
     });
     toast.success(`${pkg.name} added to cart`);
   };
@@ -93,17 +69,19 @@ function PackageDetailPage() {
       {/* Hero */}
       <section className="bg-navy text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <img
-            src={pkg.image}
-            alt=""
-            className="w-full h-full object-cover animate-ken-burns"
-          />
+          {pkg.image_url && (
+            <img
+              src={pkg.image_url}
+              alt=""
+              className="w-full h-full object-cover animate-ken-burns"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/40" />
         </div>
         <div className="relative max-w-7xl mx-auto px-6 py-8">
           <Link
             to="/packages"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-gold hover:text-gold-light transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/80 hover:text-white transition-colors"
           >
             <ArrowLeft className="size-3.5" />
             All Packages
@@ -111,13 +89,13 @@ function PackageDetailPage() {
         </div>
         <div className="relative max-w-7xl mx-auto px-6 pb-20 pt-4 grid lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-8">
-            <div className="text-xs font-bold uppercase tracking-[0.3em] text-gold mb-4">
+            <div className="text-xs font-bold uppercase tracking-[0.3em] text-white/80 mb-4">
               {pkg.callout}
             </div>
             <h1 className="font-display font-black uppercase text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.95]">
               {pkg.name}
             </h1>
-            <div className="h-1 w-24 bg-gold mt-6" />
+            <div className="h-1 w-24 bg-white mt-6" />
             <p className="mt-6 text-lg text-slate-300 max-w-2xl leading-relaxed">
               {pkg.description}
             </p>
@@ -153,7 +131,7 @@ function PackageDetailPage() {
             <ul className="space-y-5">
               {pkg.included.map((item: { label: string; note?: string }) => (
                 <li key={item.label} className="flex items-start gap-4">
-                  <span className="mt-0.5 size-6 rounded-full bg-navy text-gold grid place-items-center shrink-0">
+                  <span className="mt-0.5 size-6 rounded-full bg-navy text-white grid place-items-center shrink-0">
                     <Check className="size-3.5" strokeWidth={3} />
                   </span>
                   <div className="flex-1 flex flex-wrap justify-between gap-x-4 gap-y-1 border-b border-dashed border-slate-200 pb-4">
@@ -177,15 +155,15 @@ function PackageDetailPage() {
           <aside className="space-y-6">
             <div className="bg-navy text-white p-8 shadow-lg">
               <div className="flex items-center gap-2 mb-4">
-                <Gift className="size-4 text-gold" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
+                <Gift className="size-4 text-white" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/80">
                   You Also Receive
                 </span>
               </div>
               <ul className="space-y-3">
                 {pkg.bonuses.map((bonus: string) => (
                   <li key={bonus} className="flex items-start gap-3 text-sm">
-                    <span className="mt-1.5 size-1.5 rounded-full bg-gold shrink-0" />
+                    <span className="mt-1.5 size-1.5 rounded-full bg-white shrink-0" />
                     <span className="text-slate-100">{bonus}</span>
                   </li>
                 ))}
@@ -198,7 +176,7 @@ function PackageDetailPage() {
                 Total Value
               </div>
               <div className="font-display font-black uppercase text-2xl text-navy leading-tight">
-                {pkg.totalValue}
+                {pkg.total_value}
               </div>
             </div>
 

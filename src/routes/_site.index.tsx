@@ -10,10 +10,13 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { mockPackages } from "@/data/mockPackages";
+import { useQuery } from "@tanstack/react-query";
+import { apiGet } from "@/lib/api-client";
+import type { PackageRow } from "@/lib/admin.functions";
 import { SectionHeading } from "@/components/site/SectionHeading";
-import heroImage from "@/assets/mgm2-scaled.jpg";
-import juniorGolferImage from "@/assets/MGMimage.jpg";
+import heroImage from "@/assets/MYFAVORITEPIC.jpeg";
+
+const juniorGolferImage = "/assets/uploaded/photos/driving-range.jpg";
 
 const achievements = [
   { icon: Calendar, value: "2021", label: "First MGM Junior Tour Event" },
@@ -48,6 +51,11 @@ export const Route = createFileRoute("/_site/")({
 });
 
 function HomePage() {
+  const { data: packages } = useQuery({
+    queryKey: ["public", "packages"],
+    queryFn: () => apiGet<PackageRow[]>("/list-packages.php"),
+  });
+
   return (
     <>
       {/* Hero */}
@@ -63,7 +71,7 @@ function HomePage() {
             <h1 className="font-display font-black uppercase text-5xl md:text-7xl leading-[0.95] tracking-tight mb-6">
               Empowering
               <br />
-              <span className="italic text-gold">Young Minds</span>
+              <span className="italic text-red-light">Young Minds</span>
               <br />
               Through Golf
             </h1>
@@ -74,14 +82,14 @@ function HomePage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/schedule"
-                className="bg-gold hover:bg-white text-navy px-8 py-4 font-bold uppercase tracking-wider text-sm rounded-sm inline-flex items-center gap-2 transition-all"
+                className="bg-white hover:bg-navy-light text-navy hover:text-white px-8 py-4 font-bold uppercase tracking-wider text-sm rounded-sm inline-flex items-center gap-2 transition-all"
               >
                 View 2026 Schedule
                 <ArrowRight className="size-4" />
               </Link>
               <Link
                 to="/packages"
-                className="bg-gold hover:bg-white text-navy px-8 py-4 font-bold uppercase tracking-wider text-sm rounded-sm inline-flex items-center gap-2 transition-all"
+                className="bg-white hover:bg-navy-light text-navy hover:text-white px-8 py-4 font-bold uppercase tracking-wider text-sm rounded-sm inline-flex items-center gap-2 transition-all"
               >
                 View Packages
                 <ArrowRight className="size-4" />
@@ -95,7 +103,7 @@ function HomePage() {
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <SectionHeading
-            eyebrow="Our Mission"
+            eyebrow="Our Purpose"
             title="Going Beyond The Green"
             subtitle="Championship-caliber events designed to develop the whole athlete — on the course and off."
           />
@@ -104,12 +112,12 @@ function HomePage() {
               {
                 icon: Trophy,
                 title: "Total Game Growth",
-                body: "Competitive tournaments and clinics that develop technical skill, mental fortitude, and course management.",
+                body: "Competitive, fun junior tournaments that develop tournament skills, mental fortitude and course management.",
               },
               {
                 icon: Users,
                 title: "A Place To Belong",
-                body: "A community of junior athletes who share a passion for the traditions and etiquette of the game.",
+                body: "A community of junior golfers who share a passion to have fun in a competitive golf environment and make new friends.",
               },
               {
                 icon: Sparkles,
@@ -121,7 +129,7 @@ function HomePage() {
                 key={c.title}
                 className="bg-white border border-slate-200 rounded-xl p-8 hover:border-gold hover-lift"
               >
-                <div className="size-12 rounded-lg bg-navy text-gold grid place-items-center mb-6">
+                <div className="size-12 rounded-lg bg-navy text-white grid place-items-center mb-6">
                   <c.icon className="size-6" />
                 </div>
                 <h3 className="font-display font-bold text-xl text-navy mb-3">
@@ -146,7 +154,7 @@ function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 stagger">
             {achievements.map((a) => (
               <div key={a.label} className="text-center">
-                <div className="size-14 mx-auto rounded-full bg-white/10 text-gold grid place-items-center mb-4">
+                <div className="size-14 mx-auto rounded-full bg-white/10 text-white grid place-items-center mb-4">
                   <a.icon className="size-6" />
                 </div>
                 <div className="font-display font-black text-4xl md:text-5xl text-white mb-2">
@@ -173,14 +181,14 @@ function HomePage() {
               />
             </div>
             <div className="absolute bottom-0 translate-y-1/2 left-6 right-6 sm:right-auto bg-navy/95 backdrop-blur-sm text-white rounded-lg p-5 flex items-center gap-3 shadow-xl">
-              <div className="size-10 shrink-0 rounded-full bg-gold text-navy grid place-items-center">
+              <div className="size-10 shrink-0 rounded-full bg-white text-navy grid place-items-center">
                 <Phone className="size-4" />
               </div>
               <div>
                 <div className="text-xs text-slate-300 uppercase tracking-wider">
                   Call us anytime!
                 </div>
-                <a href="tel:+17753865594" className="font-bold text-gold hover:text-white">
+                <a href="tel:+17753865594" className="font-bold text-white hover:text-slate-200">
                   (775) 386-5594
                 </a>
               </div>
@@ -195,7 +203,7 @@ function HomePage() {
             <ul className="space-y-6 mb-10">
               {programs.map((p) => (
                 <li key={p.title} className="flex items-start gap-4">
-                  <div className="size-11 shrink-0 rounded-full bg-navy text-gold grid place-items-center">
+                  <div className="size-11 shrink-0 rounded-full bg-navy text-white grid place-items-center">
                     <p.icon className="size-5" />
                   </div>
                   <div>
@@ -239,10 +247,12 @@ function HomePage() {
             </Link>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 stagger">
-            {mockPackages.map((p) => (
-              <div
+            {(packages ?? []).map((p) => (
+              <Link
                 key={p.slug}
-                className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col hover-lift hover:border-gold"
+                to="/packages/$slug"
+                params={{ slug: p.slug }}
+                className="group bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col hover-lift hover:border-gold"
               >
                 <div className="text-[10px] font-bold uppercase tracking-widest text-gold mb-2">
                   {p.callout}
@@ -253,13 +263,10 @@ function HomePage() {
                 <div className="text-3xl font-black text-navy mb-4">
                   {p.price}
                 </div>
-                <Link
-                  to="/packages"
-                  className="mt-auto text-sm font-bold uppercase tracking-wider text-navy hover:text-gold inline-flex items-center gap-1"
-                >
+                <span className="mt-auto text-sm font-bold uppercase tracking-wider text-navy group-hover:text-gold inline-flex items-center gap-1">
                   Learn More <ArrowRight className="size-3.5" />
-                </Link>
-              </div>
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -272,12 +279,12 @@ function HomePage() {
             Ready to Tee It Up?
           </h2>
           <p className="text-slate-300 text-lg max-w-2xl mx-auto mb-10">
-            Join a community of committed junior golfers competing on the region's premier courses. Registration for the 2026 season is open.
+            Join a community of committed junior golfers competing on the region's premier courses. We run on a rolling schedule — registration is open now, with events already on the calendar through 2027.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               to="/join"
-              className="bg-gold hover:bg-white text-navy px-8 py-4 font-bold uppercase tracking-wider text-sm rounded-sm inline-flex items-center gap-2 transition-all"
+              className="bg-white hover:bg-navy-light text-navy hover:text-white px-8 py-4 font-bold uppercase tracking-wider text-sm rounded-sm inline-flex items-center gap-2 transition-all"
             >
               Join the Tour
               <ArrowRight className="size-4" />

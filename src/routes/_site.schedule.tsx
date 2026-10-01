@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ScheduleTable } from "@/components/site/ScheduleTable";
-import { mockSchedule, type ScheduleRow } from "@/data/mockSchedule";
+import type { ScheduleRow } from "@/data/schedule";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api-client";
 import type { TournamentRow } from "@/lib/admin.functions";
+import logoInspirationImage from "@/assets/LOGOACTUALPIC.jpeg";
 
 export const Route = createFileRoute("/_site/schedule")({
   head: () => ({
@@ -35,20 +36,34 @@ function SchedulePage() {
       }));
     },
   });
-  const rows = data && data.length > 0 ? data : mockSchedule;
+  const rows = data ?? [];
   return (
     <section className="bg-navy text-white py-20 min-h-[calc(100vh-4rem)]">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold mb-3">
-          Season Schedule
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-16">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/80 mb-3">
+              Season Schedule
+            </div>
+            <h1 className="font-display font-black uppercase text-5xl md:text-6xl tracking-tight leading-[1.05]">
+              2026 Schedule
+            </h1>
+            <div className="h-1 w-24 bg-white mt-6" />
+            <p className="mt-6 text-lg text-slate-300 max-w-2xl">
+              Registration is now open for all confirmed events. Click any tournament to view full details and sign up.
+            </p>
+          </div>
+          <div className="shrink-0 w-full md:w-80">
+            <img
+              src={logoInspirationImage}
+              alt="The original photo that inspired the MGM Junior Tour logo"
+              className="rounded-xl w-full h-auto object-cover shadow-lg"
+            />
+            <p className="text-base text-white/50 mt-2 text-center">
+              Photo that inspired the tour logo
+            </p>
+          </div>
         </div>
-        <h1 className="font-display font-black uppercase text-5xl md:text-6xl tracking-tight leading-[1.05]">
-          2026 Schedule
-        </h1>
-        <div className="h-1 w-24 bg-gold mt-6" />
-        <p className="mt-6 text-lg text-slate-300 max-w-2xl mb-16">
-          Registration is now open for all confirmed events. Click any tournament to view full details and sign up.
-        </p>
         <ScheduleTable data={rows} />
       </div>
     </section>

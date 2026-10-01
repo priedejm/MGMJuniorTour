@@ -27,7 +27,7 @@ export function SectionHeading({
         <div
           className={cn(
             "text-xs font-bold uppercase tracking-[0.2em] mb-3",
-            invert ? "text-gold" : "text-gold",
+            invert ? "text-white/80" : "text-gold",
           )}
         >
           {eyebrow}
@@ -43,7 +43,8 @@ export function SectionHeading({
       </h2>
       <div
         className={cn(
-          "h-1 w-20 bg-gold mt-5",
+          "h-1 w-20 mt-5",
+          invert ? "bg-white" : "bg-gold",
           align === "center" && "mx-auto",
         )}
       />

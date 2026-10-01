@@ -15,6 +15,7 @@ import { Route as SiteRouteImport } from './routes/_site'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as SiteScheduleRouteImport } from './routes/_site.schedule'
 import { Route as SitePhotosRouteImport } from './routes/_site.photos'
+import { Route as SitePartnersRouteImport } from './routes/_site.partners'
 import { Route as SiteContactRouteImport } from './routes/_site.contact'
 import { Route as SiteCheckoutRouteImport } from './routes/_site.checkout'
 import { Route as SiteCartRouteImport } from './routes/_site.cart'
@@ -23,6 +24,7 @@ import { Route as SiteAboutRouteImport } from './routes/_site.about'
 import { Route as SitePackagesIndexRouteImport } from './routes/_site.packages.index'
 import { Route as SiteTournamentSlugRouteImport } from './routes/_site.tournament.$slug'
 import { Route as SitePackagesSlugRouteImport } from './routes/_site.packages.$slug'
+import { Route as SiteCheckoutSuccessRouteImport } from './routes/_site.checkout.success'
 
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
@@ -51,6 +53,11 @@ const SiteScheduleRoute = SiteScheduleRouteImport.update({
 const SitePhotosRoute = SitePhotosRouteImport.update({
   id: '/photos',
   path: '/photos',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SitePartnersRoute = SitePartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
   getParentRoute: () => SiteRoute,
 } as any)
 const SiteContactRoute = SiteContactRouteImport.update({
@@ -93,6 +100,11 @@ const SitePackagesSlugRoute = SitePackagesSlugRouteImport.update({
   path: '/packages/$slug',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteCheckoutSuccessRoute = SiteCheckoutSuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => SiteCheckoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
@@ -101,10 +113,12 @@ export interface FileRoutesByFullPath {
   '/about': typeof SiteAboutRoute
   '/archive': typeof SiteArchiveRoute
   '/cart': typeof SiteCartRoute
-  '/checkout': typeof SiteCheckoutRoute
+  '/checkout': typeof SiteCheckoutRouteWithChildren
   '/contact': typeof SiteContactRoute
+  '/partners': typeof SitePartnersRoute
   '/photos': typeof SitePhotosRoute
   '/schedule': typeof SiteScheduleRoute
+  '/checkout/success': typeof SiteCheckoutSuccessRoute
   '/packages/$slug': typeof SitePackagesSlugRoute
   '/tournament/$slug': typeof SiteTournamentSlugRoute
   '/packages/': typeof SitePackagesIndexRoute
@@ -115,11 +129,13 @@ export interface FileRoutesByTo {
   '/about': typeof SiteAboutRoute
   '/archive': typeof SiteArchiveRoute
   '/cart': typeof SiteCartRoute
-  '/checkout': typeof SiteCheckoutRoute
+  '/checkout': typeof SiteCheckoutRouteWithChildren
   '/contact': typeof SiteContactRoute
+  '/partners': typeof SitePartnersRoute
   '/photos': typeof SitePhotosRoute
   '/schedule': typeof SiteScheduleRoute
   '/': typeof SiteIndexRoute
+  '/checkout/success': typeof SiteCheckoutSuccessRoute
   '/packages/$slug': typeof SitePackagesSlugRoute
   '/tournament/$slug': typeof SiteTournamentSlugRoute
   '/packages': typeof SitePackagesIndexRoute
@@ -132,11 +148,13 @@ export interface FileRoutesById {
   '/_site/about': typeof SiteAboutRoute
   '/_site/archive': typeof SiteArchiveRoute
   '/_site/cart': typeof SiteCartRoute
-  '/_site/checkout': typeof SiteCheckoutRoute
+  '/_site/checkout': typeof SiteCheckoutRouteWithChildren
   '/_site/contact': typeof SiteContactRoute
+  '/_site/partners': typeof SitePartnersRoute
   '/_site/photos': typeof SitePhotosRoute
   '/_site/schedule': typeof SiteScheduleRoute
   '/_site/': typeof SiteIndexRoute
+  '/_site/checkout/success': typeof SiteCheckoutSuccessRoute
   '/_site/packages/$slug': typeof SitePackagesSlugRoute
   '/_site/tournament/$slug': typeof SiteTournamentSlugRoute
   '/_site/packages/': typeof SitePackagesIndexRoute
@@ -152,8 +170,10 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/partners'
     | '/photos'
     | '/schedule'
+    | '/checkout/success'
     | '/packages/$slug'
     | '/tournament/$slug'
     | '/packages/'
@@ -166,9 +186,11 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/partners'
     | '/photos'
     | '/schedule'
     | '/'
+    | '/checkout/success'
     | '/packages/$slug'
     | '/tournament/$slug'
     | '/packages'
@@ -182,9 +204,11 @@ export interface FileRouteTypes {
     | '/_site/cart'
     | '/_site/checkout'
     | '/_site/contact'
+    | '/_site/partners'
     | '/_site/photos'
     | '/_site/schedule'
     | '/_site/'
+    | '/_site/checkout/success'
     | '/_site/packages/$slug'
     | '/_site/tournament/$slug'
     | '/_site/packages/'
@@ -238,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/photos'
       fullPath: '/photos'
       preLoaderRoute: typeof SitePhotosRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/partners': {
+      id: '/_site/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof SitePartnersRouteImport
       parentRoute: typeof SiteRoute
     }
     '/_site/contact': {
@@ -296,15 +327,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitePackagesSlugRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/checkout/success': {
+      id: '/_site/checkout/success'
+      path: '/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof SiteCheckoutSuccessRouteImport
+      parentRoute: typeof SiteCheckoutRoute
+    }
   }
 }
+
+interface SiteCheckoutRouteChildren {
+  SiteCheckoutSuccessRoute: typeof SiteCheckoutSuccessRoute
+}
+
+const SiteCheckoutRouteChildren: SiteCheckoutRouteChildren = {
+  SiteCheckoutSuccessRoute: SiteCheckoutSuccessRoute,
+}
+
+const SiteCheckoutRouteWithChildren = SiteCheckoutRoute._addFileChildren(
+  SiteCheckoutRouteChildren,
+)
 
 interface SiteRouteChildren {
   SiteAboutRoute: typeof SiteAboutRoute
   SiteArchiveRoute: typeof SiteArchiveRoute
   SiteCartRoute: typeof SiteCartRoute
-  SiteCheckoutRoute: typeof SiteCheckoutRoute
+  SiteCheckoutRoute: typeof SiteCheckoutRouteWithChildren
   SiteContactRoute: typeof SiteContactRoute
+  SitePartnersRoute: typeof SitePartnersRoute
   SitePhotosRoute: typeof SitePhotosRoute
   SiteScheduleRoute: typeof SiteScheduleRoute
   SiteIndexRoute: typeof SiteIndexRoute
@@ -317,8 +368,9 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteAboutRoute: SiteAboutRoute,
   SiteArchiveRoute: SiteArchiveRoute,
   SiteCartRoute: SiteCartRoute,
-  SiteCheckoutRoute: SiteCheckoutRoute,
+  SiteCheckoutRoute: SiteCheckoutRouteWithChildren,
   SiteContactRoute: SiteContactRoute,
+  SitePartnersRoute: SitePartnersRoute,
   SitePhotosRoute: SitePhotosRoute,
   SiteScheduleRoute: SiteScheduleRoute,
   SiteIndexRoute: SiteIndexRoute,

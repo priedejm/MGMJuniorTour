@@ -7,6 +7,29 @@ require_admin();
 
 $body = read_json_body();
 
+function pricing_list_field(array $data, string $key): array {
+    $v = $data[$key] ?? [];
+    if (!is_array($v)) json_error("Field '$key' must be an array", 422);
+    $out = [];
+    foreach ($v as $item) {
+        if (
+            !is_array($item)
+            || !isset($item['period'], $item['memberPrice'], $item['nonMemberPrice'])
+            || !is_string($item['period'])
+            || !is_string($item['memberPrice'])
+            || !is_string($item['nonMemberPrice'])
+        ) {
+            json_error("Field '$key' entries must have period, memberPrice, and nonMemberPrice strings", 422);
+        }
+        $out[] = [
+            'period' => $item['period'],
+            'memberPrice' => $item['memberPrice'],
+            'nonMemberPrice' => $item['nonMemberPrice'],
+        ];
+    }
+    return $out;
+}
+
 $row = [
     'slug' => str_field($body, 'slug', true, 120),
     'dates_label' => str_field($body, 'dates_label', true, 120),
@@ -17,6 +40,7 @@ $row = [
     'year' => int_field($body, 'year', 2026),
     'tbd' => bool_field($body, 'tbd', false),
     'sort_order' => int_field($body, 'sort_order', 0),
+    'pricing' => pricing_list_field($body, 'pricing'),
 ];
 
 $rows = read_store('tournaments');

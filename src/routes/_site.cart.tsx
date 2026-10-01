@@ -19,7 +19,7 @@ function CartPage() {
     return (
       <section className="py-24">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="size-16 mx-auto rounded-full bg-navy text-gold grid place-items-center mb-6">
+          <div className="size-16 mx-auto rounded-full bg-navy text-white grid place-items-center mb-6">
             <ShoppingBag className="size-7" />
           </div>
           <h1 className="font-display font-black uppercase text-4xl text-navy tracking-tight">
@@ -55,8 +55,8 @@ function CartPage() {
             {items.map((item) => (
               <div key={item.slug} className="p-5 md:p-6 flex gap-5">
                 <Link
-                  to="/packages/$slug"
-                  params={{ slug: item.slug }}
+                  to={item.type === "tournament" ? "/tournament/$slug" : "/packages/$slug"}
+                  params={{ slug: item.type === "tournament" ? (item.tournamentSlug ?? item.slug) : item.slug }}
                   className="w-24 h-24 md:w-28 md:h-28 shrink-0 bg-slate-100 overflow-hidden rounded"
                 >
                   <img
@@ -67,8 +67,8 @@ function CartPage() {
                 </Link>
                 <div className="flex-1 flex flex-col">
                   <Link
-                    to="/packages/$slug"
-                    params={{ slug: item.slug }}
+                    to={item.type === "tournament" ? "/tournament/$slug" : "/packages/$slug"}
+                    params={{ slug: item.type === "tournament" ? (item.tournamentSlug ?? item.slug) : item.slug }}
                     className="font-display font-bold text-navy hover:text-gold transition-colors leading-tight"
                   >
                     {item.name}
@@ -113,7 +113,7 @@ function CartPage() {
           </div>
 
           <aside className="bg-navy text-white p-8 shadow-lg sticky top-20">
-            <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold mb-4">
+            <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/70 mb-4">
               Order Summary
             </div>
             <div className="space-y-3 text-sm">
@@ -140,13 +140,13 @@ function CartPage() {
             </div>
             <Link
               to="/checkout"
-              className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-gold hover:bg-white text-navy py-4 font-bold uppercase text-sm tracking-[0.2em] transition-colors"
+              className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-navy-light text-navy hover:text-white py-4 font-bold uppercase text-sm tracking-[0.2em] transition-colors"
             >
               Checkout <ArrowRight className="size-4" />
             </Link>
             <Link
               to="/packages"
-              className="mt-3 block text-center text-xs font-bold uppercase tracking-[0.2em] text-white/60 hover:text-gold transition-colors"
+              className="mt-3 block text-center text-xs font-bold uppercase tracking-[0.2em] text-white/60 hover:text-white transition-colors"
             >
               ← Continue Shopping
             </Link>

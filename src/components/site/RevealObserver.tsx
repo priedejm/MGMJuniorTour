@@ -80,9 +80,24 @@ export function RevealObserver() {
       requestAnimationFrame(() => requestAnimationFrame(scan));
     });
 
+    // Route changes aren't the only way new content appears — async data
+    // (a query resolving after mount) can swap in whole new subtrees too.
+    // Without this, content that mounts after the one-time scan() above
+    // can get tagged data-reveal (via a later scan) with nothing left to
+    // ever check whether it's already on-screen, leaving it stuck at
+    // opacity: 0 indefinitely. Debounce so rapid mutations coalesce.
+    let mutationTimer: ReturnType<typeof setTimeout> | null = null;
+    const mo = new MutationObserver(() => {
+      if (mutationTimer) clearTimeout(mutationTimer);
+      mutationTimer = setTimeout(scan, 50);
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
     return () => {
       io.disconnect();
       unsub();
+      mo.disconnect();
+      if (mutationTimer) clearTimeout(mutationTimer);
     };
   }, [router]);
 

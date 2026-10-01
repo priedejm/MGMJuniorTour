@@ -16,7 +16,7 @@ $entity = $_POST['entity'] ?? '';
 if (!is_string($entity) || !preg_match('/^[a-z]+$/', $entity)) {
     json_error('Invalid entity', 422);
 }
-$allowedEntities = ['tournaments', 'packages', 'photos', 'results', 'misc'];
+$allowedEntities = ['tournaments', 'packages', 'photos', 'results', 'partners', 'misc'];
 if (!in_array($entity, $allowedEntities, true)) {
     json_error('Unknown entity', 422);
 }

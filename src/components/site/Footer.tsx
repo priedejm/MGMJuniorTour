@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 
 export function Footer() {
   return (
@@ -16,17 +16,14 @@ export function Footer() {
           </Link>
           <p className="text-slate-500 max-w-sm mb-6 leading-relaxed">
             Providing opportunities for young golfers to compete and grow through
-            elite tournament experiences since 2012.
+            elite tournament experiences for nine seasons.
           </p>
           <div className="flex gap-3">
-            <a href="#" className="size-10 bg-slate-100 hover:bg-navy hover:text-white text-navy rounded-full grid place-items-center transition-colors">
+            <a href="https://www.facebook.com/MorganGolfManagement1" target="_blank" rel="noopener noreferrer" className="size-10 bg-slate-100 hover:bg-navy hover:text-white text-navy rounded-full grid place-items-center transition-colors">
               <Facebook className="size-4" />
             </a>
-            <a href="#" className="size-10 bg-slate-100 hover:bg-navy hover:text-white text-navy rounded-full grid place-items-center transition-colors">
+            <a href="https://www.instagram.com/mgmjrtourgolf/" target="_blank" rel="noopener noreferrer" className="size-10 bg-slate-100 hover:bg-navy hover:text-white text-navy rounded-full grid place-items-center transition-colors">
               <Instagram className="size-4" />
-            </a>
-            <a href="#" className="size-10 bg-slate-100 hover:bg-navy hover:text-white text-navy rounded-full grid place-items-center transition-colors">
-              <Youtube className="size-4" />
             </a>
           </div>
         </div>
@@ -36,9 +33,9 @@ export function Footer() {
           </h4>
           <ul className="space-y-3 text-slate-600 text-sm">
             <li><Link to="/schedule" className="hover:text-gold">Tournament Schedule</Link></li>
-            <li><Link to="/packages" className="hover:text-gold">Membership Tiers</Link></li>
+            <li><Link to="/packages" className="hover:text-gold">Total Golf Package Tiers</Link></li>
             <li><Link to="/photos" className="hover:text-gold">Photo Gallery</Link></li>
-            <li><Link to="/archive" className="hover:text-gold">Results Archive</Link></li>
+            <li><Link to="/partners" className="hover:text-gold">Our Partners</Link></li>
           </ul>
         </div>
         <div>

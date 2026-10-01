@@ -9,7 +9,11 @@ import {
 } from "react";
 
 export type CartItem = {
-  slug: string;
+  slug: string; // unique cart key (composite for tournaments, e.g. `${tournamentSlug}-${priceType}-${periodIndex}`)
+  type?: "package" | "tournament"; // undefined = package, for backward compat
+  tournamentSlug?: string;
+  periodIndex?: number;
+  priceType?: "memberPrice" | "nonMemberPrice";
   name: string;
   price: string; // display price e.g. "$2,995"
   unitPrice: number; // numeric parsed

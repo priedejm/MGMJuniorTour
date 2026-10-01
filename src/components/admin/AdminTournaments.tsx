@@ -1,13 +1,15 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, X } from "lucide-react";
 import {
   listTournaments,
   upsertTournament,
   deleteTournament,
 } from "@/lib/admin.functions";
 import { Field, inputCls, PrimaryBtn, GhostBtn, Card } from "./adminUi";
+
+type PricingRow = { period: string; memberPrice: string; nonMemberPrice: string };
 
 type Row = {
   id?: string;
@@ -20,6 +22,7 @@ type Row = {
   year: number;
   tbd: boolean;
   sort_order: number;
+  pricing: PricingRow[];
 };
 
 const empty = (): Row => ({
@@ -32,6 +35,10 @@ const empty = (): Row => ({
   year: new Date().getFullYear(),
   tbd: false,
   sort_order: 0,
+  pricing: [
+    { period: "Early Registration", memberPrice: "", nonMemberPrice: "" },
+    { period: "Standard Registration", memberPrice: "", nonMemberPrice: "" },
+  ],
 });
 
 export function AdminTournaments() {
@@ -150,6 +157,12 @@ export function AdminTournaments() {
               <span className="text-sm text-slate-600">Mark as TBD (registration closed)</span>
             </label>
           </div>
+
+          <PricingEditor
+            items={editing.pricing}
+            onChange={(pricing) => setEditing({ ...editing, pricing })}
+          />
+
           <div className="flex gap-3 mt-6">
             <PrimaryBtn onClick={onSave}>
               <Save className="inline size-3.5 mr-1" /> Save
@@ -202,6 +215,72 @@ export function AdminTournaments() {
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+function PricingEditor({
+  items,
+  onChange,
+}: {
+  items: PricingRow[];
+  onChange: (v: PricingRow[]) => void;
+}) {
+  return (
+    <div className="mt-4">
+      <span className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">
+        Pricing (registration period + member / non-member price)
+      </span>
+      <div className="space-y-2">
+        {items.map((it, i) => (
+          <div key={i} className="grid grid-cols-[2fr_1fr_1fr_auto] gap-2">
+            <input
+              placeholder="Period (e.g. Early Registration, before Aug 19)"
+              className={inputCls}
+              value={it.period}
+              onChange={(e) => {
+                const c = [...items];
+                c[i] = { ...c[i], period: e.target.value };
+                onChange(c);
+              }}
+            />
+            <input
+              placeholder="Member price ($295)"
+              className={inputCls}
+              value={it.memberPrice}
+              onChange={(e) => {
+                const c = [...items];
+                c[i] = { ...c[i], memberPrice: e.target.value };
+                onChange(c);
+              }}
+            />
+            <input
+              placeholder="Non-member price ($375)"
+              className={inputCls}
+              value={it.nonMemberPrice}
+              onChange={(e) => {
+                const c = [...items];
+                c[i] = { ...c[i], nonMemberPrice: e.target.value };
+                onChange(c);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => onChange(items.filter((_, ii) => ii !== i))}
+              className="text-slate-400 hover:text-red-500"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => onChange([...items, { period: "", memberPrice: "", nonMemberPrice: "" }])}
+          className="text-xs font-bold uppercase text-navy hover:text-gold"
+        >
+          <Plus className="inline size-3" /> Add pricing row
+        </button>
       </div>
     </div>
   );

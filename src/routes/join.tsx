@@ -56,7 +56,7 @@ function JoinPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-navy text-white px-6 py-4 flex items-center justify-center border-b border-white/10">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="size-9 bg-gold rounded-full grid place-items-center text-navy font-bold text-[10px]">
+          <div className="size-9 bg-white rounded-full grid place-items-center text-navy font-bold text-[10px]">
             MGM
           </div>
           <span className="font-display font-bold tracking-tight text-base">

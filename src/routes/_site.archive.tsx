@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { mockArchive, type ArchiveEntry } from "@/data/mockArchive";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api-client";
 import type { ResultRow } from "@/lib/admin.functions";
@@ -14,6 +13,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
+type ArchiveEntry = {
+  id: string;
+  tournament_name: string;
+  date: string; // ISO
+  location: string;
+  results_url?: string;
+  year: number;
+  month: string;
+  images: string[];
+};
 
 export const Route = createFileRoute("/_site/archive")({
   head: () => ({
@@ -50,7 +60,7 @@ function ArchivePage() {
     },
   });
 
-  const source = dbData && dbData.length > 0 ? dbData : mockArchive;
+  const source = dbData ?? [];
 
   const years = useMemo(
     () => Array.from(new Set(source.map((a) => a.year))).sort((a, b) => b - a),

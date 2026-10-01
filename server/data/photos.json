@@ -1,1 +1,9 @@
-[]
+[
+  { "id": "photo-1", "image_url": "/assets/uploaded/photos/driving-range.jpg", "caption": "Driving range warm-up", "sort_order": 1 },
+  { "id": "photo-2", "image_url": "/assets/uploaded/photos/instruction.webp", "caption": "PGA Professional instruction", "sort_order": 2 },
+  { "id": "photo-3", "image_url": "/assets/uploaded/photos/putting-green.jpg", "caption": "On the green", "sort_order": 3 },
+  { "id": "photo-4", "image_url": "/assets/uploaded/photos/junior-practice.jpg", "caption": "Junior golfers at practice", "sort_order": 4 },
+  { "id": "photo-5", "image_url": "/assets/uploaded/photos/scenic-green.jpg", "caption": "Reading the green", "sort_order": 5 },
+  { "id": "photo-6", "image_url": "/assets/uploaded/photos/course-landscape.jpg", "caption": "Tour course scenery", "sort_order": 6 },
+  { "id": "photo-7", "image_url": "/assets/uploaded/photos/me-and-chuck.jpeg", "caption": "", "sort_order": 7 }
+]

@@ -27,9 +27,9 @@ export async function submitLead(input: { data: z.input<typeof leadSchema> }) {
 }
 
 export async function listLeads(): Promise<Lead[]> {
-  return apiGet<Lead[]>("/list-leads.php", true);
+  return apiGet<Lead[]>("/list-leads.php");
 }
 
 export async function deleteLead(input: { data: { id: string } }) {
-  return apiPost<{ ok: true }>("/delete-lead.php", input.data, true);
+  return apiPost<{ ok: true }>("/delete-lead.php", input.data);
 }
